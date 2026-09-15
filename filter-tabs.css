@@ -1,3 +1,7 @@
+/* Pendant la lecture du réglage, réserver la place sans peindre les anciens onglets. */
+html[data-gsaio-pending] :is(#hdtb, #top_nav, [role="navigation"] [role="list"], nav ul) {
+  visibility: hidden !important;
+}
 [data-gsaio-row] { display: flex !important; flex-flow: row nowrap !important; align-items: stretch !important; }
 [data-gsaio-order] { flex-shrink: 0 !important; }
 [data-gsaio-hide] { display: none !important; }

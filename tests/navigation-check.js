@@ -18,10 +18,13 @@
     assert(new URL(eco.href).searchParams.get('udm') === 'web', 'Eco utilise le lien Web');
     const news = ordered()[1].querySelector('a');
     const originalHref = news.href;
+    const maps = ordered()[4];
     results.push('Ordre, alignement, lien Eco et masquage IA : OK');
     document.body.append(document.createElement('aside'));
     await frame();
     assert(ordered().length === 5 && ordered()[1].querySelector('a') === news, 'Mise à jour sans doublons ni remplacement natif');
+    assert(ordered()[4] === maps, 'Un changement hors navigation ne reconstruit pas Maps');
+    if (window.paintFailures) assert(window.paintFailures.length === 0, 'Aucune frame avec les anciens onglets visibles');
     window.changes.forEach(fn => fn({state:{newValue:{enabled:false}}}, 'local'));
     await frame();
     assert(!document.querySelector('[data-gsaio-row], [data-gsaio-added], [data-gsaio-hide]'), 'Désactivation restaure la navigation');

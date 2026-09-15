@@ -14,7 +14,7 @@
     "matches": ["*://www.google.com/search*", "*://google.com/search*", "*://www.google.fr/search*", "*://google.fr/search*"],
     "js": ["ai-guard.js", "filter-tabs.js"],
     "css": ["filter-tabs.css"],
-    "run_at": "document_idle"
+    "run_at": "document_start"
   }],
   "action": { "default_title": "Google sans AI Overview", "default_popup": "popup.html" },
   "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'none'" }

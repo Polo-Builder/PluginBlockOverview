@@ -23,12 +23,29 @@
     while (node.parentElement && node.parentElement !== row) node = node.parentElement;
     return node.parentElement === row ? node : null;
   };
-  let enabled = true, scheduled = false;
+  const surfaces = '#hdtb, #top_nav, nav, [role="navigation"]';
+  let enabled = null;
+  let activeRow = null;
   const renamed = new Map();
-  const observer = new MutationObserver(schedule);
+  // Les mutations sont traitées avant le prochain rendu, sans attendre une frame.
+  // Ignorer les résultats et annonces : ils ne nécessitent pas de refaire les onglets.
+  const observer = new MutationObserver((records) => {
+    if (enabled === null) { pending(true); return; }
+    if (!enabled) return;
+    if (records.some(record => {
+      const target = record.target.nodeType === 1 ? record.target : record.target.parentElement;
+      if (target?.closest(surfaces)) return true;
+      return [...record.addedNodes, ...record.removedNodes].some(node => node.nodeType === 1 &&
+        (node === activeRow || node.contains(activeRow) || node.matches(surfaces) || node.querySelector(surfaces)));
+    })) update();
+  });
   const observe = () => observer.observe(document, { childList: true, subtree: true, characterData: true });
+  function pending(value) {
+    document.documentElement?.toggleAttribute('data-gsaio-pending', value);
+  }
 
   function reset() {
+    activeRow = null;
     for (const [node, text] of renamed) node.textContent = text;
     renamed.clear();
     document.querySelectorAll('[data-gsaio-added]').forEach((node) => node.remove());
@@ -38,7 +55,7 @@
   }
 
   function findRow() {
-    for (const surface of document.querySelectorAll('#hdtb, #top_nav, nav, [role="navigation"]')) {
+    for (const surface of document.querySelectorAll(surfaces)) {
       const tabs = [...surface.querySelectorAll(controls)].filter((node) =>
         !node.closest('[data-gsaio-added]') && labels.test(normalize(node.textContent)));
       if (tabs.length < 3) continue;
@@ -56,13 +73,17 @@
   function update() {
     observer.disconnect();
     try {
-      if (!enabled || location.pathname !== "/search") { reset(); return; }
+      if (!enabled || location.pathname !== "/search") { reset(); pending(false); return; }
       const current = new URL(location.href);
-      if (!current.searchParams.get("q")) return;
+      if (!current.searchParams.get("q")) { pending(false); return; }
       reset();
       const found = findRow();
-      if (!found) return;
+      if (!found) {
+        if (document.readyState !== 'loading') pending(false);
+        return;
+      }
       const { row, tabs } = found;
+      activeRow = row;
       // Réinitialiser uniquement nos attributs et les liens manquants ajoutés.
       // Les onglets natifs gardent leurs enfants, href, événements et position DOM.
       row.setAttribute("data-gsaio-row", "");
@@ -133,16 +154,18 @@
         const item = branch(row, tab);
         if (item && !kept.has(item)) item.setAttribute("data-gsaio-hide", "");
       }
-    } finally { observe(); }
+      pending(false);
+    } finally { if (enabled !== false) observe(); }
   }
-  function schedule() {
-    if (scheduled) return;
-    scheduled = true;
-    requestAnimationFrame(() => { scheduled = false; update(); });
-  }
+  pending(true);
+  observe();
   chrome.storage.local.get("state", ({ state }) => { enabled = state?.enabled ?? true; update(); });
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && changes.state) { enabled = changes.state.newValue?.enabled ?? true; schedule(); }
+    if (area === "local" && changes.state) { enabled = changes.state.newValue?.enabled ?? true; update(); }
   });
-  addEventListener("popstate", schedule);
+  // Ne pas laisser une navigation inconnue invisible si Google change sa structure.
+  document.addEventListener('DOMContentLoaded', () => {
+    if (enabled !== null) { update(); pending(false); }
+  }, { once: true });
+  addEventListener("popstate", update);
 })();
