@@ -11,6 +11,17 @@ const condition = (suffix) => ({
 });
 
 export const RULES = [
+  // Le mode IA doit être redirigé même en présence d'un autre filtre.
+  {
+    id: 4, priority: 3,
+    action: { type: "redirect", redirect: { transform: {
+      queryTransform: {
+        removeParams: ["tbm", "gsaio_view", "aep", "aim", "atvm"],
+        addOrReplaceParams: [{ key: "udm", value: WEB_VALUE }]
+      }
+    } } },
+    condition: condition("udm=50(&|$)")
+  },
   {
     id: 1, priority: 1,
     action: { type: "redirect", redirect: { transform: {
@@ -18,7 +29,7 @@ export const RULES = [
     } } },
     condition: condition("q=[^&#]+(&|$)")
   },
-  // Respecter un filtre explicitement choisi (Images, Vidéos, Mode IA…).
+  // Respecter les autres filtres explicitement choisis (Images, Vidéos…).
   // Inclut le Web actuel et les anciens liens udm=14 : pas de boucle.
   // udm vide ou 0 correspond à une recherche générale et reste redirigé.
   {

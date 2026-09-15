@@ -44,7 +44,7 @@ export async function setWeb(enabled) {
     } catch {
       state.report = {
         title: "Plugin désactivé avec une restauration incomplète",
-        applied: ["Redirection et modifications des pages Google désactivées."],
+        applied: ["Redirection des recherches Google désactivée."],
         skipped: ["Préchargement Chrome : restauration impossible. Réessayez avec le bouton de restauration."]
       };
     }

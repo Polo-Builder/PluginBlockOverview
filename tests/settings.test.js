@@ -28,7 +28,7 @@ beforeEach(() => {
 });
 test("installation ON ; OFF persiste au redémarrage", async () => {
   assert.equal((await initialize()).enabled, true);
-  assert.equal(rules.length, 3);
+  assert.equal(rules.length, 4);
   await setWeb(false);
   await initialize();
   assert.equal(rules.length, 0);
@@ -98,7 +98,7 @@ test("échec DNR : retour à la préférence précédente", async () => {
   await initialize(); failRules = true;
   await assert.rejects(setWeb(false));
   assert.equal((await readState()).enabled, true);
-  assert.equal(rules.length, 3);
+  assert.equal(rules.length, 4);
 });
 test("échec privacy : jamais de faux succès, sauvegarde conservée", async () => {
   failSet = true;

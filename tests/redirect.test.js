@@ -10,6 +10,14 @@ function action(url, type = "main_frame", method = "get") {
     new RegExp(c.regexFilter).test(networkURL)
   ).sort((a, b) => b.priority - a.priority)[0]?.action;
 }
+test("l’ancien marqueur Tous ne contourne plus la redirection", () => {
+  for (const host of ["www.google.com", "www.google.fr"]) {
+    assert.equal(action(`https://${host}/search?q=chat&gsaio_view=all`)?.type, "redirect");
+    assert.equal(action(`https://${host}/search?gsaio_view=all&q=chat`)?.type, "redirect");
+    assert.equal(action(`https://${host}/search?q=chat&gsaio_view=allx`)?.type, "redirect");
+    assert.equal(action(`https://${host}/search?q=chat%26gsaio_view%3Dall`)?.type, "redirect");
+  }
+});
 for (const host of ["google.com", "www.google.com", "google.fr", "www.google.fr"]) {
   for (const query of ["q=chat", "hl=fr&q=caf%C3%A9%20%26%20th%C3%A9&start=10", "q=a&udm=0", "udm=&q=a", "q=a&tbm="]) {
     test(`redirige ${host} ${query}`, () => {
@@ -29,11 +37,26 @@ for (const host of ["google.com", "www.google.com", "google.fr", "www.google.fr"
     });
   }
 }
-for (const filter of ["udm=web", "udm=14", "udm=2", "udm=vids", "udm=7", "udm=50", "tbm=nws", "tbm=isch", "udm=future"]) {
+for (const filter of ["udm=web", "udm=14", "udm=2", "udm=vids", "udm=7", "tbm=nws", "tbm=isch", "udm=future"]) {
   test(`respecte ${filter}`, () => {
     assert.equal(action(`https://www.google.com/search?q=chat&${filter}`)?.type, "allow");
   });
 }
+
+test("le mode IA est redirigé sans boucle, même avec un filtre ou un ancien contournement", () => {
+  for (const host of ["google.com", "www.google.com", "google.fr", "www.google.fr"]) {
+    for (const query of ["q=chat&udm=50", "udm=50&q=chat&tbm=nws", "q=chat&gsaio_view=all&udm=50", "udm=50"]) {
+      const url = new URL(`https://${host}/search?${query}`);
+      const result = action(url.href);
+      assert.equal(result?.type, "redirect");
+      const transform = result.redirect.transform.queryTransform;
+      for (const key of transform.removeParams) url.searchParams.delete(key);
+      for (const { key, value } of transform.addOrReplaceParams) url.searchParams.set(key, value);
+      assert.equal(url.searchParams.get("udm"), "web");
+      assert.equal(action(url.href)?.type, "allow");
+    }
+  }
+});
 for (const url of [
   "https://www.google.com.evil.test/search?q=chat", "https://evil.test/search?q=chat",
   "https://accounts.google.com/search?q=chat", "https://www.google.com/preferences?q=chat",

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Google sans AI Overview",
-  "version": "1.0.1",
-  "description": "Force les résultats Web de Google et simplifie sa navigation lorsque le plugin est activé.",
+  "version": "1.0.5",
+  "description": "Force les résultats Web de Google en conservant sa navigation native.",
   "minimum_chrome_version": "103",
   "permissions": ["storage", "declarativeNetRequestWithHostAccess", "privacy"],
   "host_permissions": [
@@ -11,10 +11,10 @@
   ],
   "background": { "service_worker": "background.js", "type": "module" },
   "content_scripts": [{
-    "matches": ["*://www.google.com/*", "*://google.com/*", "*://www.google.fr/*", "*://google.fr/*"],
-    "js": ["search-tabs.js"],
-    "css": ["search-tabs.css"],
-    "run_at": "document_start"
+    "matches": ["*://www.google.com/search*", "*://google.com/search*", "*://www.google.fr/search*", "*://google.fr/search*"],
+    "js": ["ai-guard.js", "filter-tabs.js"],
+    "css": ["filter-tabs.css"],
+    "run_at": "document_idle"
   }],
   "action": { "default_title": "Google sans AI Overview", "default_popup": "popup.html" },
   "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'none'" }

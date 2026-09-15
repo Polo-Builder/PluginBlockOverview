@@ -1,0 +1,21 @@
+[data-gsaio-row] { display: flex !important; flex-flow: row nowrap !important; align-items: stretch !important; }
+[data-gsaio-order] { flex-shrink: 0 !important; }
+[data-gsaio-hide] { display: none !important; }
+[data-gsaio-order="0"] { order: -5 !important; }
+[data-gsaio-order="1"] { order: -4 !important; }
+[data-gsaio-order="2"] { order: -3 !important; }
+[data-gsaio-order="3"] { order: -2 !important; }
+[data-gsaio-order="4"] { order: -1 !important; }
+[data-gsaio-added] { display: flex; align-items: stretch; flex-shrink: 0; }
+[data-gsaio-added]:not([data-gsaio-native-style]) > a {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px;
+  color: inherit;
+  font: 14px Arial, sans-serif;
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+}
+[data-gsaio-added] > a[aria-current="page"] { border-bottom-color: currentColor; font-weight: bold; }
+[data-gsaio-added] > a:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
