@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Google sans AI Overview</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="popup.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Google sans AI Overview</h1>
+    <p>Les liens Web, dans l’interface habituelle de Google.</p>
+    <label class="toggle">
+      <span>Activer le plugin : <strong id="mode">…</strong></span>
+      <input id="enabled" type="checkbox" role="switch" disabled>
+    </label>
+    <p class="hint">Désactivé, le plugin ne redirige plus les recherches et rend à Google sa barre de navigation d’origine.</p>
+    <p class="hint">Activé, les onglets de recherche sont : Web, Actualités, Images, Vidéos et Maps.</p>
+    <section class="eco" aria-labelledby="eco-title">
+      <h2 id="eco-title">Limiter les chargements évitables</h2>
+      <p>Quand le plugin est actif, force les résultats Web et désactive le préchargement des pages <strong>dans tout Chrome</strong>. Certaines pages pourront s’ouvrir moins vite. Réglage réversible.</p>
+      <button id="eco" disabled>Paramétrage écologique automatique</button>
+      <button id="restore" class="secondary" disabled>Restaurer les réglages automatiques</button>
+    </section>
+    <div id="status" role="status" aria-live="polite" aria-atomic="true"></div>
+    <details>
+      <summary>Options Google à vérifier manuellement</summary>
+      <p>Dans <a href="https://labs.google.com/search" target="_blank" rel="noreferrer">Search Labs</a>, désactivez les expériences génératives auxquelles vous participez, si cette option existe pour votre compte.</p>
+      <p>Dans les <a href="https://www.google.com/preferences?hl=fr#tabVal=1" target="_blank" rel="noreferrer">paramètres Google</a>, désactivez les aperçus vidéo automatiques si le réglage est proposé. Il n’est pas disponible partout.</p>
+      <p>Ces options ne sont pas modifiées par l’extension. La personnalisation est conservée, faute de bénéfice établi.</p>
+    </details>
+    <p class="footnote">Le mode Web demande des résultats sans AI Overview. Il ne contrôle pas les calculs des serveurs Google ni toute utilisation d’IA. Aucune économie d’énergie mesurée.</p>
+  </main>
+</body>
+</html>
