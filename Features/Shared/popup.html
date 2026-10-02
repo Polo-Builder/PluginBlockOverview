@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EcoWeb</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="popup.js"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <h1><img src="assets/google-eco-rounded.png" width="28" height="28" alt=""> EcoWeb</h1>
+      <label class="toggle">
+        <span id="mode">…</span>
+        <input id="enabled" type="checkbox" role="switch" aria-label="Activer l’extension" disabled>
+      </label>
+    </header>
+    <section class="feature" aria-labelledby="block-title">
+      <h2 id="block-title">Blocage IA</h2>
+      <p>Aperçus et mode IA évités via les résultats Web.</p>
+    </section>
+    <section class="feature" aria-labelledby="tabs-title">
+      <h2 id="tabs-title">Onglet Eco</h2>
+      <p>Eco · Actualités · Images · Vidéos · Maps</p>
+    </section>
+    <section class="eco" aria-labelledby="eco-title">
+      <h2 id="eco-title">Réglages automatiques</h2>
+      <p>Active Web et coupe le préchargement dans tout Chrome.</p>
+      <div class="actions">
+        <button id="eco" disabled>Appliquer</button>
+        <button id="restore" class="secondary" disabled>Restaurer</button>
+      </div>
+    </section>
+    <section class="feature upcoming" aria-labelledby="accounts-title">
+      <h2 id="accounts-title">Multi-compte <span class="badge">À venir</span></h2>
+    </section>
+    <div id="status" role="status" aria-live="polite" aria-atomic="true"></div>
+  </main>
+</body>
+</html>

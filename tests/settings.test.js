@@ -1,6 +1,8 @@
 import test, { beforeEach } from "node:test";
 import assert from "node:assert/strict";
-import { initialize, readState, setWeb, applyEco, restore } from "../settings.js";
+import { initialize, setWeb } from "../Features/Shared/settings.js";
+import { readState } from "../Features/Shared/state.js";
+import { applyEco, restore } from "../Features/AutoEcoSetting/settings.js";
 
 let stored, rules, underlying, override, locked, failRules, failSet, failClear, changes;
 beforeEach(() => {

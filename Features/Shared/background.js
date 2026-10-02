@@ -1,4 +1,6 @@
-import { initialize, readState, setWeb, applyEco, restore } from "./settings.js";
+import { initialize, setWeb } from "./settings.js";
+import { readState } from "./state.js";
+import { applyEco, restore } from "../AutoEcoSetting/settings.js";
 
 // Une file unique évite les conflits entre popup, installation et redémarrage.
 let queue = Promise.resolve();

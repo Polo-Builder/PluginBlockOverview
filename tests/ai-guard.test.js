@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync(new URL('../ai-guard.js', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../Features/BlockOverviewIA/ai-guard.js', import.meta.url), 'utf8');
 function run(href, enabled = true) {
   const calls = [], events = {};
   const location = { href, replace: url => calls.push(url) };

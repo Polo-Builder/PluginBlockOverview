@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { RULES } from "../redirect.js";
+import { RULES } from "../Features/BlockOverviewIA/redirect.js";
 
 // Modèle local des conditions utilisées ; ne remplace pas le moteur DNR Chrome.
 function action(url, type = "main_frame", method = "get") {

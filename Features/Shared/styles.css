@@ -1,0 +1,32 @@
+:root { font-family: system-ui, sans-serif; color: #203a2a; background: #fff; font-size: 12px; }
+* { box-sizing: border-box; }
+body { width: 320px; margin: 0; }
+main { padding: 16px; }
+header, .toggle { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+header { padding-bottom: 12px; border-bottom: 1px solid #dce7df; }
+h1 { font-size: 19px; margin: 0; font-weight: 650; color: #17643b; }
+h2 { font-size: 13px; margin: 0; font-weight: 650; }
+p { line-height: 1.45; margin: 4px 0 0; color: #526459; }
+.toggle { font-size: 11px; font-weight: 600; }
+input { appearance: none; width: 34px; height: 20px; margin: 0; border-radius: 20px; background: #707b74; position: relative; flex: 0 0 auto; cursor: pointer; }
+input::after { content: ""; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: white; top: 3px; left: 3px; }
+input:checked { background: #17643b; }
+input:checked::after { left: 17px; }
+.feature { padding: 11px 0; }
+.feature + .feature { border-top: 1px solid #edf1ee; }
+.eco { background: #f0f6f1; padding: 12px; border: 1px solid #dce7df; border-radius: 9px; }
+.actions { display: flex; gap: 8px; margin-top: 10px; }
+button { flex: 1; font: inherit; font-weight: 600; cursor: pointer; padding: 8px; border: 1px solid transparent; border-radius: 6px; color: white; background: #17643b; }
+button.secondary { color: #245538; background: transparent; border-color: #a5bdad; }
+button:disabled, input:disabled { opacity: .5; cursor: default; }
+:focus-visible { outline: 2px solid #17643b; outline-offset: 3px; }
+.upcoming { padding-bottom: 0; color: #64746a; }
+.upcoming h2 { display: flex; align-items: center; justify-content: space-between; }
+.badge { background: #edf3ee; color: #526459; padding: 3px 7px; border-radius: 5px; font-size: 10px; font-weight: 500; }
+#status:not(:empty) { border-top: 1px solid #dce7df; margin-top: 12px; padding-top: 10px; }
+summary { cursor: pointer; color: #245538; line-height: 1.45; }
+li { margin: 4px 0; line-height: 1.4; }
+ul { padding-left: 17px; margin: 5px 0 10px; }
+
+h1 { display: flex; align-items: center; gap: 8px; }
+h1 img { display: block; flex-shrink: 0; }

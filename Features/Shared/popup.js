@@ -10,13 +10,12 @@ function render() {
   restoreButton.disabled = Object.keys(state.backup).length === 0;
   status.replaceChildren();
   if (!state.report) return;
-  const context = document.createElement("p");
-  context.className = "hint";
-  context.textContent = "Compte rendu de la dernière opération";
-  status.append(context);
-  const title = document.createElement("h2");
+  const details = document.createElement("details");
+  const title = document.createElement("summary");
   title.textContent = state.report.title;
-  status.append(title);
+  if (state.report.skipped.length) title.textContent += " · points à vérifier";
+  details.append(title);
+  status.append(details);
   for (const [key, label] of [["applied", "Appliqué / déjà en place"], ["skipped", "Non appliqué automatiquement"]]) {
     if (!state.report[key].length) continue;
     const heading = document.createElement("strong");
@@ -27,7 +26,7 @@ function render() {
       item.textContent = text;
       list.append(item);
     }
-    status.append(heading, list);
+    details.append(heading, list);
   }
 }
 

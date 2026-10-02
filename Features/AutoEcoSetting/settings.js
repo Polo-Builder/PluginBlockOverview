@@ -1,57 +1,6 @@
-import { syncRedirect } from "./redirect.js";
-
-export async function readState() {
-  const { state } = await chrome.storage.local.get("state");
-  return { enabled: true, backup: {}, report: null, ...state };
-}
-const save = (state) => chrome.storage.local.set({ state });
-const prediction = () => chrome.privacy.network.networkPredictionEnabled;
-
-export async function initialize() {
-  const state = await readState();
-  await syncRedirect(state.enabled);
-  await save(state);
-  return state;
-}
-
-async function changeWeb(state, enabled) {
-  const previous = state.enabled;
-  // Journaliser avant l'effet : le prochain réveil peut terminer une interruption.
-  state.enabled = enabled;
-  await save(state);
-  try {
-    await syncRedirect(enabled);
-  } catch (error) {
-    state.enabled = previous;
-    await save(state);
-    throw error;
-  }
-}
-
-export async function setWeb(enabled) {
-  if (typeof enabled !== "boolean") throw new Error("Préférence invalide.");
-  const state = await readState();
-  await changeWeb(state, enabled);
-  // L'interrupteur pilote toute l'extension. OFF libère aussi le réglage Chrome.
-  delete state.backup.web;
-  state.report = null;
-  if (!enabled && state.backup.prediction) {
-    try {
-      await prediction().clear({ scope: "regular" });
-      const after = await prediction().get({});
-      if (after.levelOfControl === "controlled_by_this_extension") throw new Error("Consigne encore active");
-      delete state.backup.prediction;
-    } catch {
-      state.report = {
-        title: "Plugin désactivé avec une restauration incomplète",
-        applied: ["Redirection des recherches Google désactivée."],
-        skipped: ["Préchargement Chrome : restauration impossible. Réessayez avec le bouton de restauration."]
-      };
-    }
-  }
-  await save(state);
-  return state;
-}
+import { readState, save } from "../Shared/state.js";
+import { changeWeb } from "../BlockOverviewIA/mode.js";
+import { prediction, releasePrediction } from "./prediction.js";
 
 export async function applyEco() {
   const state = await readState();
@@ -113,14 +62,7 @@ export async function restore() {
   }
   if (state.backup.prediction) {
     try {
-      // clear retire uniquement notre consigne ; set(previousValue) écraserait
-      // les choix plus récents de l'utilisateur ou d'une autre extension.
-      await prediction().clear({ scope: "regular" });
-      const after = await prediction().get({});
-      if (after.levelOfControl === "controlled_by_this_extension") {
-        throw new Error("Consigne encore active");
-      }
-      delete state.backup.prediction;
+      await releasePrediction(state);
       report.applied.push("Préchargement : contrôle rendu à vos réglages Chrome.");
     } catch {
       report.skipped.push("Préchargement : restauration impossible. Réessayez.");
