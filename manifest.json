@@ -15,6 +15,12 @@
     "js": ["Features/BlockOverviewIA/ai-guard.js", "Features/EcoTab/filter-tabs.js"],
     "css": ["Features/EcoTab/filter-tabs.css"],
     "run_at": "document_start"
+  }, {
+    "matches": ["http://*/*", "https://*/*"],
+    "js": ["Features/AutoDenyCookies/content.js"],
+    "run_at": "document_idle",
+    "all_frames": true,
+    "match_about_blank": true
   }],
   "icons": { "128": "Features/Shared/assets/google-eco-rounded.png" },
   "action": { "default_icon": "Features/Shared/assets/google-eco-rounded.png", "default_title": "EcoWeb", "default_popup": "Features/Shared/popup.html" },

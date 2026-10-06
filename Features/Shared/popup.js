@@ -1,4 +1,5 @@
 const toggle = document.querySelector("#enabled");
+const cookiesToggle = document.querySelector("#auto-deny-cookies");
 const eco = document.querySelector("#eco");
 const restoreButton = document.querySelector("#restore");
 const status = document.querySelector("#status");
@@ -6,6 +7,7 @@ let state;
 
 function render() {
   toggle.checked = state.enabled;
+  cookiesToggle.checked = state.autoDenyCookies;
   document.querySelector("#mode").textContent = state.enabled ? "ON" : "OFF";
   restoreButton.disabled = Object.keys(state.backup).length === 0;
   status.replaceChildren();
@@ -31,7 +33,7 @@ function render() {
 }
 
 async function send(type, extra = {}) {
-  for (const control of [toggle, eco, restoreButton]) control.disabled = true;
+  for (const control of [toggle, cookiesToggle, eco, restoreButton]) control.disabled = true;
   status.textContent = "Vérification en cours…";
   try {
     const result = await chrome.runtime.sendMessage({ type, ...extra });
@@ -44,11 +46,13 @@ async function send(type, extra = {}) {
     status.textContent = error.message;
   } finally {
     toggle.disabled = !state;
+    cookiesToggle.disabled = !state || !state.enabled;
     eco.disabled = !state || !state.enabled;
     restoreButton.disabled = !state || !Object.keys(state.backup).length;
   }
 }
 toggle.addEventListener("change", () => send("setWeb", { enabled: toggle.checked }));
+cookiesToggle.addEventListener("change", () => send("setAutoDenyCookies", { enabled: cookiesToggle.checked }));
 eco.addEventListener("click", () => send("applyEco"));
 restoreButton.addEventListener("click", () => send("restore"));
 send("getState");

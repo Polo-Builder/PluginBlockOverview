@@ -10,6 +10,14 @@ export async function initialize() {
   return state;
 }
 
+export async function setAutoDenyCookies(enabled) {
+  if (typeof enabled !== "boolean") throw new Error("Préférence invalide.");
+  const state = await readState();
+  state.autoDenyCookies = enabled;
+  await save(state);
+  return state;
+}
+
 export async function setWeb(enabled) {
   if (typeof enabled !== "boolean") throw new Error("Préférence invalide.");
   const state = await readState();

@@ -1,4 +1,4 @@
-import { initialize, setWeb } from "./settings.js";
+import { initialize, setWeb, setAutoDenyCookies } from "./settings.js";
 import { readState } from "./state.js";
 import { applyEco, restore } from "../AutoEcoSetting/settings.js";
 
@@ -19,6 +19,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
   const operations = {
     getState: readState,
     setWeb: () => setWeb(message.enabled),
+    setAutoDenyCookies: () => setAutoDenyCookies(message.enabled),
     applyEco,
     restore
   };

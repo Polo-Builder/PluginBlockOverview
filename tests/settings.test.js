@@ -1,6 +1,6 @@
 import test, { beforeEach } from "node:test";
 import assert from "node:assert/strict";
-import { initialize, setWeb } from "../Features/Shared/settings.js";
+import { initialize, setWeb, setAutoDenyCookies } from "../Features/Shared/settings.js";
 import { readState } from "../Features/Shared/state.js";
 import { applyEco, restore } from "../Features/AutoEcoSetting/settings.js";
 
@@ -35,6 +35,15 @@ test("installation ON ; OFF persiste au redémarrage", async () => {
   await initialize();
   assert.equal(rules.length, 0);
   assert.equal((await readState()).enabled, false);
+});
+
+test("refus cookies activé par défaut et préférence conservée au redémarrage et OFF/ON", async () => {
+  assert.equal((await initialize()).autoDenyCookies, true);
+  await setAutoDenyCookies(false);
+  await setWeb(false); await setWeb(true);
+  assert.equal((await initialize()).autoDenyCookies, false);
+  await assert.rejects(setAutoDenyCookies('true'));
+  assert.equal((await readState()).autoDenyCookies, false);
 });
 test("bouton automatique idempotent, sauvegarde et restauration", async () => {
   await initialize(); await setWeb(false);
