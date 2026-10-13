@@ -1,6 +1,6 @@
-import { initialize, setWeb, setAutoDenyCookies } from "./settings.js";
+import { initialize, setWeb, setAutoDenyCookies, setFeature } from "./settings.js";
 import { readState } from "./state.js";
-import { applyEco, restore } from "../AutoEcoSetting/settings.js";
+import { applyEco, restore } from "../Features/AutoEcoSetting/settings.js";
 
 // Une file unique évite les conflits entre popup, installation et redémarrage.
 let queue = Promise.resolve();
@@ -20,6 +20,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     getState: readState,
     setWeb: () => setWeb(message.enabled),
     setAutoDenyCookies: () => setAutoDenyCookies(message.enabled),
+    setFeature: () => setFeature(message.feature, message.enabled),
     applyEco,
     restore
   };

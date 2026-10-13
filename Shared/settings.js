@@ -1,11 +1,16 @@
-import { syncRedirect } from "../BlockOverviewIA/redirect.js";
-import { changeWeb } from "../BlockOverviewIA/mode.js";
-import { releasePrediction } from "../AutoEcoSetting/prediction.js";
+import { syncRedirect } from "../Features/BlockOverviewIA/redirect.js";
+import { changeWeb } from "../Features/BlockOverviewIA/mode.js";
+import { prediction, releasePrediction } from "../Features/AutoEcoSetting/prediction.js";
 import { readState, save } from "./state.js";
 
 export async function initialize() {
   const state = await readState();
-  await syncRedirect(state.enabled);
+  await syncRedirect(state.enabled && state.blockAI);
+  if (state.ecoApplied) {
+    try {
+      state.ecoApplied = state.enabled && state.blockAI && (await prediction().get({})).value === false;
+    } catch { state.ecoApplied = false; }
+  }
   await save(state);
   return state;
 }
@@ -18,6 +23,28 @@ export async function setAutoDenyCookies(enabled) {
   return state;
 }
 
+export async function setFeature(feature, enabled) {
+  if (!["blockAI", "ecoTab"].includes(feature) || typeof enabled !== "boolean") {
+    throw new Error("Préférence invalide.");
+  }
+  const state = await readState();
+  const previous = state[feature];
+  state[feature] = enabled;
+  await save(state);
+  if (feature === "blockAI") {
+    try { await syncRedirect(state.enabled && enabled); }
+    catch (error) {
+      state[feature] = previous;
+      await save(state);
+      throw error;
+    }
+    delete state.backup.blockAI;
+    if (!enabled) state.ecoApplied = false;
+  }
+  await save(state);
+  return state;
+}
+
 export async function setWeb(enabled) {
   if (typeof enabled !== "boolean") throw new Error("Préférence invalide.");
   const state = await readState();
@@ -25,6 +52,7 @@ export async function setWeb(enabled) {
   // L'interrupteur pilote toute l'extension. OFF libère aussi le réglage Chrome.
   delete state.backup.web;
   state.report = null;
+  if (!enabled) state.ecoApplied = false;
   if (!enabled && state.backup.prediction) {
     try {
       await releasePrediction(state);

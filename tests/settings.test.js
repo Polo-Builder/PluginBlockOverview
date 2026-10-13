@@ -1,7 +1,7 @@
 import test, { beforeEach } from "node:test";
 import assert from "node:assert/strict";
-import { initialize, setWeb, setAutoDenyCookies } from "../Features/Shared/settings.js";
-import { readState } from "../Features/Shared/state.js";
+import { initialize, setWeb, setAutoDenyCookies, setFeature } from "../Shared/settings.js";
+import { readState } from "../Shared/state.js";
 import { applyEco, restore } from "../Features/AutoEcoSetting/settings.js";
 
 let stored, rules, underlying, override, locked, failRules, failSet, failClear, changes;
@@ -129,5 +129,55 @@ test("échec restauration : sauvegarde conservée pour réessayer", async () => 
 test("réveil après interruption : réconcilie le mode Web journalisé", async () => {
   stored = { state: { enabled: false, backup: {}, report: null } };
   await initialize();
+  assert.equal(rules.length, 0);
+});
+
+test("interrupteurs indépendants : IA pilote les redirections, Eco conserve sa préférence", async () => {
+  await initialize();
+  await setFeature("blockAI", false);
+  assert.equal(rules.length, 0);
+  assert.equal((await readState()).enabled, true);
+  await setFeature("ecoTab", false);
+  await setWeb(false); await setWeb(true);
+  const state = await initialize();
+  assert.equal(state.blockAI, false);
+  assert.equal(state.ecoTab, false);
+  assert.equal(rules.length, 0);
+  await setFeature("blockAI", true);
+  assert.equal(rules.length, 4);
+  await assert.rejects(setFeature("unknown", true));
+  await assert.rejects(setFeature("ecoTab", "true"));
+});
+
+test("échec du toggle IA : préférence précédente conservée", async () => {
+  await initialize(); failRules = true;
+  await assert.rejects(setFeature("blockAI", false));
+  assert.equal((await readState()).blockAI, true);
+  assert.equal(rules.length, 4);
+});
+
+test("coche confirmée, persistante et retirée si les réglages changent", async () => {
+  assert.equal((await applyEco()).ecoApplied, true);
+  assert.equal((await initialize()).ecoApplied, true);
+  await setFeature("ecoTab", false);
+  assert.equal((await initialize()).ecoApplied, true);
+  locked = "controlled_by_other_extensions";
+  assert.equal((await initialize()).ecoApplied, false);
+  locked = null;
+  await applyEco();
+  assert.equal((await setFeature("blockAI", false)).ecoApplied, false);
+  await applyEco();
+  assert.equal((await restore()).ecoApplied, false);
+});
+
+test("coche absente en cas d’échec et restauration du choix IA", async () => {
+  failSet = true;
+  assert.equal((await applyEco()).ecoApplied, false);
+  failSet = false;
+  await setFeature("blockAI", false);
+  const applied = await applyEco();
+  assert.equal(applied.blockAI, true);
+  assert.equal(applied.ecoApplied, true);
+  assert.equal((await restore()).blockAI, false);
   assert.equal(rules.length, 0);
 });

@@ -9,7 +9,7 @@
     "*://www.google.com/*", "*://google.com/*",
     "*://www.google.fr/*", "*://google.fr/*"
   ],
-  "background": { "service_worker": "Features/Shared/background.js", "type": "module" },
+  "background": { "service_worker": "Shared/background.js", "type": "module" },
   "content_scripts": [{
     "matches": ["*://www.google.com/search*", "*://google.com/search*", "*://www.google.fr/search*", "*://google.fr/search*"],
     "js": ["Features/BlockOverviewIA/ai-guard.js", "Features/EcoTab/filter-tabs.js"],
@@ -22,7 +22,7 @@
     "all_frames": true,
     "match_about_blank": true
   }],
-  "icons": { "128": "Features/Shared/assets/google-eco-rounded.png" },
-  "action": { "default_icon": "Features/Shared/assets/google-eco-rounded.png", "default_title": "EcoWeb", "default_popup": "Features/Shared/popup.html" },
+  "icons": { "128": "Shared/assets/google-eco-rounded.png" },
+  "action": { "default_icon": "Shared/assets/google-eco-rounded.png", "default_title": "EcoWeb", "default_popup": "Popup/popup.html" },
   "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'none'" }
 }

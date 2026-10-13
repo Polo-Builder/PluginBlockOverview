@@ -159,9 +159,9 @@
   }
   pending(true);
   observe();
-  chrome.storage.local.get("state", ({ state }) => { enabled = state?.enabled ?? true; update(); });
+  chrome.storage.local.get("state", ({ state }) => { enabled = (state?.enabled ?? true) && (state?.ecoTab ?? true); update(); });
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && changes.state) { enabled = changes.state.newValue?.enabled ?? true; update(); }
+    if (area === "local" && changes.state) { enabled = (changes.state.newValue?.enabled ?? true) && (changes.state.newValue?.ecoTab ?? true); update(); }
   });
   // Ne pas laisser une navigation inconnue invisible si Google change sa structure.
   document.addEventListener('DOMContentLoaded', () => {

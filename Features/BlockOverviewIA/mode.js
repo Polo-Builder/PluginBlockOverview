@@ -1,5 +1,5 @@
 import { syncRedirect } from "./redirect.js";
-import { save } from "../Shared/state.js";
+import { save } from "../../Shared/state.js";
 
 export async function changeWeb(state, enabled) {
   const previous = state.enabled;
@@ -7,7 +7,7 @@ export async function changeWeb(state, enabled) {
   state.enabled = enabled;
   await save(state);
   try {
-    await syncRedirect(enabled);
+    await syncRedirect(enabled && state.blockAI);
   } catch (error) {
     state.enabled = previous;
     await save(state);

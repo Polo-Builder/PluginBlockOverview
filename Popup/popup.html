@@ -10,38 +10,49 @@
 <body>
   <main>
     <header>
-      <h1><img src="assets/google-eco-rounded.png" width="28" height="28" alt=""> EcoWeb</h1>
+      <h1><img src="../Shared/assets/google-eco-rounded.png" width="28" height="28" alt=""> EcoWeb</h1>
       <label class="toggle">
         <span id="mode">…</span>
         <input id="enabled" type="checkbox" role="switch" aria-label="Activer l’extension" disabled>
       </label>
     </header>
+
     <section class="feature" aria-labelledby="block-title">
-      <h2 id="block-title">Blocage IA</h2>
-      <p>Aperçus et mode IA évités via les résultats Web.</p>
+      <label class="toggle">
+        <h2 id="block-title">Blocage IA</h2>
+        <input id="block-ai" type="checkbox" role="switch" aria-labelledby="block-title" disabled>
+      </label>
+      <p>Masque les aperçus IA des résultats de recherche.</p>
     </section>
+
     <section class="feature" aria-labelledby="tabs-title">
-      <h2 id="tabs-title">Onglet Eco</h2>
-      <p>Eco · Actualités · Images · Vidéos · Maps</p>
+      <label class="toggle">
+        <h2 id="tabs-title">Onglet Eco</h2>
+        <input id="eco-tab" type="checkbox" role="switch" aria-labelledby="tabs-title" disabled>
+      </label>
+      <p>L’onglet principal devient Eco : juste l’essentiel.</p>
     </section>
+    
     <section class="feature" aria-labelledby="cookies-title">
       <label class="toggle">
         <h2 id="cookies-title">Refus automatique des cookies</h2>
         <input id="auto-deny-cookies" type="checkbox" role="switch" aria-labelledby="cookies-title" disabled>
       </label>
-      <p>Refuse les cookies facultatifs sur les bannières reconnues. Les cookies nécessaires restent autorisés.</p>
+      <p>Refuse automatiquement les cookies non essentiels.</p>
     </section>
+
     <section class="eco" aria-labelledby="eco-title">
-      <h2 id="eco-title">Réglages automatiques</h2>
-      <p>Active Web et coupe le préchargement dans tout Chrome.</p>
+      <div class="eco-heading">
+        <h2 id="eco-title">Réglages automatiques</h2>
+        <span id="eco-done" role="status" hidden>✓ OK</span>
+      </div>
+      <p>Réduit l'activité de Chromme en arrière-plan.</p>
       <div class="actions">
         <button id="eco" disabled>Appliquer</button>
         <button id="restore" class="secondary" disabled>Restaurer</button>
       </div>
     </section>
-    <section class="feature upcoming" aria-labelledby="accounts-title">
-      <h2 id="accounts-title">Multi-compte <span class="badge">À venir</span></h2>
-    </section>
+
     <div id="status" role="status" aria-live="polite" aria-atomic="true"></div>
   </main>
 </body>

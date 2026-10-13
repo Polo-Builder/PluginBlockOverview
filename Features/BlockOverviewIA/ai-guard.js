@@ -13,9 +13,9 @@
     const target = enabled && webURL(location.href);
     if (target) location.replace(target);
   }
-  chrome.storage.local.get("state", ({ state }) => { enabled = state?.enabled ?? true; check(); });
+  chrome.storage.local.get("state", ({ state }) => { enabled = (state?.enabled ?? true) && (state?.blockAI ?? true); check(); });
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && changes.state) { enabled = changes.state.newValue?.enabled ?? true; check(); }
+    if (area === "local" && changes.state) { enabled = (changes.state.newValue?.enabled ?? true) && (changes.state.newValue?.blockAI ?? true); check(); }
   });
   document.addEventListener("click", (event) => {
     if (!enabled) return;
