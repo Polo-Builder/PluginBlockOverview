@@ -7,7 +7,8 @@
   "permissions": ["storage", "declarativeNetRequestWithHostAccess", "privacy"],
   "host_permissions": [
     "*://www.google.com/*", "*://google.com/*",
-    "*://www.google.fr/*", "*://google.fr/*"
+    "*://www.google.fr/*", "*://google.fr/*",
+    "https://lens.google.com/*"
   ],
   "background": { "service_worker": "build/src/background.js", "type": "module" },
   "content_scripts": [{
@@ -15,6 +16,12 @@
     "js": ["build/src/shared/i18n.js", "build/src/shared/google-language.js", "build/src/features/BlockOverviewIA/ai-guard.js", "build/src/features/EcoTab/filter-tabs.js"],
     "css": ["src/features/EcoTab/filter-tabs.css"],
     "run_at": "document_start"
+  }, {
+    "matches": ["*://www.google.com/search*", "*://google.com/search*", "*://www.google.fr/search*", "*://google.fr/search*", "https://lens.google.com/*"],
+    "js": ["build/src/features/BlockOverviewIA/lens-overview.js"],
+    "css": ["src/features/BlockOverviewIA/lens-overview.css"],
+    "run_at": "document_start",
+    "all_frames": true
   }, {
     "matches": ["*://www.google.com/*", "*://google.com/*", "*://www.google.fr/*", "*://google.fr/*"],
     "exclude_matches": ["*://www.google.com/search*", "*://google.com/search*", "*://www.google.fr/search*", "*://google.fr/search*"],

@@ -1,0 +1,6 @@
+/* Conteneurs IA Lens observés : masquer aussi l’en-tête et la génération. */
+html[data-ecoweb-lens-block-ai] [data-aim="1"][data-fsid],
+html[data-ecoweb-lens-block-ai] [data-async-type="folsrch"],
+html[data-ecoweb-lens-block-ai] [data-ecoweb-lens-overview] {
+  display: none !important;
+}
