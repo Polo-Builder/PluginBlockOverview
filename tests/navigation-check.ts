@@ -1,5 +1,6 @@
 // Exécuter dans /search?q=chat avec google-navigation.html, les styles Google,
-// src/features/EcoTab/filter-tabs.css, un mock chrome.storage et build/src/features/EcoTab/filter-tabs.js.
+// src/features/EcoTab/filter-tabs.css, un mock chrome.storage, build/src/shared/i18n.js
+// puis build/src/features/EcoTab/filter-tabs.js.
 (async () => {
   const frame = () => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
   const assert = (value: unknown, message: string) => { if (!value) throw new Error(message); };
@@ -9,7 +10,9 @@
     const row = document.querySelector('[data-gsaio-row]')!;
     const ordered = () => [...row.querySelectorAll<HTMLElement>(':scope > [data-gsaio-order]')]
       .sort((a, b) => Number(a.dataset.gsaioOrder) - Number(b.dataset.gsaioOrder));
-    assert(ordered().map(n => n.textContent!.trim()).join(',') === 'Eco,Actualités,Images,Vidéos,Maps', 'Ordre des cinq onglets');
+    const language = EcoWebI18n.googleLanguage(location.href, document.documentElement.lang);
+    const labels: EcoWebI18n.Key[] = ['eco', 'news', 'images', 'videos', 'maps'];
+    assert(ordered().map(n => n.textContent!.trim()).join(',') === labels.map(key => EcoWebI18n.text(key, language)).join(','), 'Ordre des cinq onglets');
     const bounds = ordered().map(n => n.getBoundingClientRect());
     assert(bounds.every((r, i) => r.width > 0 && Math.abs(r.top - bounds[0].top) < 1 &&
       (!i || r.left >= bounds[i - 1].right - 1)), 'Alignement horizontal sans chevauchement');

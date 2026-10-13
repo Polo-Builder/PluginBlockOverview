@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>EcoWeb</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="../../build/src/shared/i18n.js"></script>
   <script type="module" src="../../build/src/popup/popup.js"></script>
 </head>
 <body>
@@ -13,43 +14,43 @@
       <h1><img src="../../assets/icons/eco-web-rounded.png" width="28" height="28" alt=""> EcoWeb</h1>
       <label class="toggle">
         <span id="mode">…</span>
-        <input id="enabled" type="checkbox" role="switch" aria-label="Activer l’extension" disabled>
+        <input id="enabled" type="checkbox" role="switch" data-i18n-label="enableExtension" disabled>
       </label>
     </header>
 
     <section class="feature" aria-labelledby="block-title">
       <label class="toggle">
-        <h2 id="block-title">Blocage IA</h2>
+        <h2 id="block-title" data-i18n="blockTitle"></h2>
         <input id="block-ai" type="checkbox" role="switch" aria-labelledby="block-title" disabled>
       </label>
-      <p>Masque les aperçus IA des résultats de recherche.</p>
+      <p data-i18n="blockDescription"></p>
     </section>
 
     <section class="feature" aria-labelledby="tabs-title">
       <label class="toggle">
-        <h2 id="tabs-title">Onglet Eco</h2>
+        <h2 id="tabs-title" data-i18n="tabsTitle"></h2>
         <input id="eco-tab" type="checkbox" role="switch" aria-labelledby="tabs-title" disabled>
       </label>
-      <p>L’onglet principal devient Eco : juste l’essentiel.</p>
+      <p data-i18n="tabsDescription"></p>
     </section>
     
     <section class="feature" aria-labelledby="cookies-title">
       <label class="toggle">
-        <h2 id="cookies-title">Refus automatique des cookies</h2>
+        <h2 id="cookies-title" data-i18n="cookiesTitle"></h2>
         <input id="auto-deny-cookies" type="checkbox" role="switch" aria-labelledby="cookies-title" disabled>
       </label>
-      <p>Refuse automatiquement les cookies non essentiels.</p>
+      <p data-i18n="cookiesDescription"></p>
     </section>
 
     <section class="eco" aria-labelledby="eco-title">
       <div class="eco-heading">
-        <h2 id="eco-title">Réglages automatiques</h2>
-        <span id="eco-done" role="status" hidden>✓ OK</span>
+        <h2 id="eco-title" data-i18n="settingsTitle"></h2>
+        <span id="eco-done" role="status" data-i18n="settingsDone" hidden></span>
       </div>
-      <p>Réduit l'activité de Chromme en arrière-plan.</p>
+      <p data-i18n="settingsDescription"></p>
       <div class="actions">
-        <button id="eco" disabled>Appliquer</button>
-        <button id="restore" class="secondary" disabled>Restaurer</button>
+        <button id="eco" data-i18n="apply" disabled></button>
+        <button id="restore" class="secondary" data-i18n="restore" disabled></button>
       </div>
     </section>
 

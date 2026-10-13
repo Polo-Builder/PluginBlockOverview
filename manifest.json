@@ -12,8 +12,13 @@
   "background": { "service_worker": "build/src/background.js", "type": "module" },
   "content_scripts": [{
     "matches": ["*://www.google.com/search*", "*://google.com/search*", "*://www.google.fr/search*", "*://google.fr/search*"],
-    "js": ["build/src/features/BlockOverviewIA/ai-guard.js", "build/src/features/EcoTab/filter-tabs.js"],
+    "js": ["build/src/shared/i18n.js", "build/src/shared/google-language.js", "build/src/features/BlockOverviewIA/ai-guard.js", "build/src/features/EcoTab/filter-tabs.js"],
     "css": ["src/features/EcoTab/filter-tabs.css"],
+    "run_at": "document_start"
+  }, {
+    "matches": ["*://www.google.com/*", "*://google.com/*", "*://www.google.fr/*", "*://google.fr/*"],
+    "exclude_matches": ["*://www.google.com/search*", "*://google.com/search*", "*://www.google.fr/search*", "*://google.fr/search*"],
+    "js": ["build/src/shared/i18n.js", "build/src/shared/google-language.js"],
     "run_at": "document_start"
   }, {
     "matches": ["http://*/*", "https://*/*"],

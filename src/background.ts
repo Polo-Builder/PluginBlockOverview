@@ -31,7 +31,7 @@ chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender, reply) 
     return operations[message.type]();
   }).then(
     (state) => reply({ ok: true, state }),
-    () => reply({ ok: false, error: "Le réglage n’a pas pu être confirmé. Rouvrez la popup pour réessayer." })
+    () => reply({ ok: false, error: "settingsUnconfirmed" })
   );
   return true;
 });
