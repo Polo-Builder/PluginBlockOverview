@@ -9,20 +9,20 @@
     "*://www.google.com/*", "*://google.com/*",
     "*://www.google.fr/*", "*://google.fr/*"
   ],
-  "background": { "service_worker": "Shared/background.js", "type": "module" },
+  "background": { "service_worker": "build/src/background.js", "type": "module" },
   "content_scripts": [{
     "matches": ["*://www.google.com/search*", "*://google.com/search*", "*://www.google.fr/search*", "*://google.fr/search*"],
-    "js": ["Features/BlockOverviewIA/ai-guard.js", "Features/EcoTab/filter-tabs.js"],
-    "css": ["Features/EcoTab/filter-tabs.css"],
+    "js": ["build/src/features/BlockOverviewIA/ai-guard.js", "build/src/features/EcoTab/filter-tabs.js"],
+    "css": ["src/features/EcoTab/filter-tabs.css"],
     "run_at": "document_start"
   }, {
     "matches": ["http://*/*", "https://*/*"],
-    "js": ["Features/AutoDenyCookies/content.js"],
+    "js": ["build/src/features/AutoDenyCookies/content.js"],
     "run_at": "document_idle",
     "all_frames": true,
     "match_about_blank": true
   }],
-  "icons": { "128": "Shared/assets/google-eco-rounded.png" },
-  "action": { "default_icon": "Shared/assets/google-eco-rounded.png", "default_title": "EcoWeb", "default_popup": "Popup/popup.html" },
+  "icons": { "128": "assets/icons/eco-web-rounded.png" },
+  "action": { "default_icon": "assets/icons/eco-web-rounded.png", "default_title": "EcoWeb", "default_popup": "src/popup/popup.html" },
   "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'none'" }
 }

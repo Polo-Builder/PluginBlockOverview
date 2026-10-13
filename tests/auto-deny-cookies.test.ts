@@ -3,32 +3,41 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync(new URL('../Features/AutoDenyCookies/content.js', import.meta.url), 'utf8');
-function setup(state = {}, context = 'Nous utilisons des cookies') {
-  let changed, mutated, task, observing = false;
-  const buttons = [];
+const source = readFileSync(new URL('../src/features/AutoDenyCookies/content.js', import.meta.url), 'utf8');
+type State = Partial<import("../src/shared/types.js").ExtensionState>;
+interface ButtonOptions { known?: boolean; hidden?: boolean; disabled?: boolean; }
+interface MockButton extends ButtonOptions {
+  textContent: string;
+  clicks: number;
+  click(): void;
+}
+function setup(state: State = {}, context = 'Nous utilisons des cookies') {
+  let changed!: (changes: { state: { newValue: State } }, area: string) => void;
+  let mutated!: (records: { type: string; addedNodes: object[] }[]) => void;
+  let task: (() => void) | null = null, observing = false;
+  const buttons: MockButton[] = [];
   const body = {};
   const panel = { textContent: context, parentElement: body };
-  const root = { isConnected: true, querySelectorAll: () => buttons, contains: node => buttons.includes(node) };
+  const root = { isConnected: true, querySelectorAll: () => buttons, contains: (node: MockButton) => buttons.includes(node) };
   vm.runInNewContext(source, {
     document: { body, documentElement: root },
     chrome: { storage: {
-      local: { get: (_, cb) => cb({ state }) },
-      onChanged: { addListener: fn => { changed = fn; } }
+      local: { get: (_: string, cb: (data: { state: State }) => void) => cb({ state }) },
+      onChanged: { addListener: (fn: typeof changed) => { changed = fn; } }
     } },
-    setTimeout: fn => { task = fn; return 1; }, clearTimeout: () => { task = null; },
+    setTimeout: (fn: () => void) => { task = fn; return 1; }, clearTimeout: () => { task = null; },
     getComputedStyle: () => ({ visibility: 'visible', opacity: '1' }),
     MutationObserver: class {
-      constructor(fn) { mutated = fn; }
+      constructor(fn: typeof mutated) { mutated = fn; }
       observe() { observing = true; }
       disconnect() { observing = false; }
     }
   });
   return {
-    add(text, options = {}) {
+    add(text: string, options: ButtonOptions = {}) {
       const button = {
         textContent: text, parentElement: panel, isConnected: true, clicks: 0,
-        matches: selector => selector.startsWith('button,') || (options.known && selector.includes('#onetrust')),
+        matches: (selector: string) => selector.startsWith('button,') || (options.known && selector.includes('#onetrust')),
         querySelectorAll: () => [], contains: () => false,
         getAttribute: () => null, getClientRects: () => options.hidden ? [] : [{}],
         closest: () => null, click() { this.clicks++; }, ...options
@@ -37,7 +46,7 @@ function setup(state = {}, context = 'Nous utilisons des cookies') {
       return button;
     },
     flush() { const run = task; task = null; run?.(); },
-    change(next) { changed({ state: { newValue: next } }, 'local'); },
+    change(next: State) { changed({ state: { newValue: next } }, 'local'); },
     mutate() { if (observing) mutated([{ type: 'childList', addedNodes: [{ ...root, nodeType: 1 }] }]); },
     get observing() { return observing; }
   };

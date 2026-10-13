@@ -1,10 +1,11 @@
-import { readState, save } from "../../Shared/state.js";
+import { readState, save } from "../../shared/state.js";
 import { changeWeb } from "../BlockOverviewIA/mode.js";
 import { prediction, releasePrediction } from "./prediction.js";
+import type { SettingsReport } from "../../shared/types.js";
 
 export async function applyEco() {
   const state = await readState();
-  const report = { title: "Paramétrage terminé", applied: [], skipped: [] };
+  const report: SettingsReport = { title: "Paramétrage terminé", applied: [], skipped: [] };
   state.ecoApplied = false;
   const previousBlockAI = state.blockAI;
   try {
@@ -55,7 +56,7 @@ export async function applyEco() {
 
 export async function restore() {
   const state = await readState();
-  const report = { title: "Restauration terminée", applied: [], skipped: [] };
+  const report: SettingsReport = { title: "Restauration terminée", applied: [], skipped: [] };
   state.ecoApplied = false;
   if (state.backup.blockAI !== undefined) {
     const previous = state.blockAI;

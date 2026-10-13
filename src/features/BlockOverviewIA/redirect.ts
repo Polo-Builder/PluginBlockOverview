@@ -3,14 +3,14 @@
 export const WEB_VALUE = "web";
 const prefix = "^https?://(www\\.)?google\\.(com|fr)/search\\?";
 const param = "([^&#]*&)*";
-const condition = (suffix) => ({
+const condition = (suffix: string): chrome.declarativeNetRequest.RuleCondition => ({
   regexFilter: prefix + param + suffix,
   isUrlFilterCaseSensitive: true,
   resourceTypes: ["main_frame"],
   requestMethods: ["get"]
 });
 
-export const RULES = [
+export const RULES: chrome.declarativeNetRequest.Rule[] = [
   // Le mode IA doit être redirigé même en présence d'un autre filtre.
   {
     id: 4, priority: 3,
@@ -42,7 +42,7 @@ export const RULES = [
   }
 ];
 
-export async function syncRedirect(enabled) {
+export async function syncRedirect(enabled: boolean) {
   const current = await chrome.declarativeNetRequest.getDynamicRules();
   const desired = enabled ? RULES : [];
   if (JSON.stringify(current) === JSON.stringify(desired)) return;

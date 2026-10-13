@@ -1,14 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { RULES } from "../Features/BlockOverviewIA/redirect.js";
+import { RULES } from "../src/features/BlockOverviewIA/redirect.js";
 
 // Modèle local des conditions utilisées ; ne remplace pas le moteur DNR Chrome.
-function action(url, type = "main_frame", method = "get") {
+type ResourceType = NonNullable<chrome.declarativeNetRequest.RuleCondition["resourceTypes"]>[number];
+type RequestMethod = NonNullable<chrome.declarativeNetRequest.RuleCondition["requestMethods"]>[number];
+function action(url: string, type: ResourceType = "main_frame", method: RequestMethod = "get") {
   const networkURL = url.split("#")[0];
   return RULES.filter(({ condition: c }) =>
-    c.resourceTypes.includes(type) && c.requestMethods.includes(method) &&
-    new RegExp(c.regexFilter).test(networkURL)
-  ).sort((a, b) => b.priority - a.priority)[0]?.action;
+    c.resourceTypes!.includes(type) && c.requestMethods!.includes(method) &&
+    new RegExp(c.regexFilter!).test(networkURL)
+  ).sort((a, b) => b.priority! - a.priority!)[0]?.action;
 }
 test("l’ancien marqueur Tous ne contourne plus la redirection", () => {
   for (const host of ["www.google.com", "www.google.fr"]) {
@@ -25,7 +27,7 @@ for (const host of ["google.com", "www.google.com", "google.fr", "www.google.fr"
       const result = action(url);
       assert.equal(result?.type, "redirect");
       const transformed = new URL(url);
-      for (const { key, value } of result.redirect.transform.queryTransform.addOrReplaceParams) {
+      for (const { key, value } of result.redirect!.transform!.queryTransform!.addOrReplaceParams!) {
         transformed.searchParams.set(key, value);
       }
       assert.equal(transformed.searchParams.get("udm"), "web");
@@ -49,9 +51,9 @@ test("le mode IA est redirigé sans boucle, même avec un filtre ou un ancien co
       const url = new URL(`https://${host}/search?${query}`);
       const result = action(url.href);
       assert.equal(result?.type, "redirect");
-      const transform = result.redirect.transform.queryTransform;
-      for (const key of transform.removeParams) url.searchParams.delete(key);
-      for (const { key, value } of transform.addOrReplaceParams) url.searchParams.set(key, value);
+      const transform = result.redirect!.transform!.queryTransform!;
+      for (const key of transform.removeParams!) url.searchParams.delete(key);
+      for (const { key, value } of transform.addOrReplaceParams!) url.searchParams.set(key, value);
       assert.equal(url.searchParams.get("udm"), "web");
       assert.equal(action(url.href)?.type, "allow");
     }

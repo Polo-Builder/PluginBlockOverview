@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["chrome", "node"],
+    "strict": true,
+    "noEmitOnError": true,
+    "skipLibCheck": true,
+    "rootDir": ".",
+    "outDir": "build"
+  },
+  "include": ["src/**/*.ts", "tests/**/*.ts"]
+}

@@ -2,16 +2,18 @@
 (() => {
   const controls = 'button, a, input[type="button"], input[type="submit"], [role="button"]';
   const knownReject = '#onetrust-reject-all-handler, #CybotCookiebotDialogBodyButtonDecline, .cmplz-deny, #didomi-notice-disagree-button, .qc-cmp2-summary-buttons button[mode="secondary"]';
-  const normalize = (text) => (text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+  type State = Partial<import("../../shared/types.js").ExtensionState>;
+  type Control = HTMLElement & { value?: string; disabled?: boolean };
+  const normalize = (text: string | null | undefined) => (text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
   // Libellés entiers uniquement : ne jamais confondre refus, acceptation et réglages.
   const rejectLabel = /^(?:(?:tout refuser|refuser tout|refuser|je refuse|continuer sans accepter|reject all|reject all cookies|reject|decline all|decline|deny all|alle ablehnen|ablehnen|rechazar todo|rechazar todas|rechazar|rifiuta tutti|rifiuta)(?: les cookies| cookies)?|(?:accepter uniquement|autoriser uniquement|only allow|accept only) (?:les cookies necessaires|les cookies essentiels|necessary cookies|essential cookies)|only necessary(?: cookies)?|necessary cookies only)[.!]?$/;
   const cookieContext = /\b(cookie|cookies|consentement|consent|confidentialite|privacy|datenschutz)\b/;
-  const clicked = new WeakSet();
+  const clicked = new WeakSet<Control>();
   let enabled = false;
-  let timer = null;
-  const pending = new Set();
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  const pending = new Set<Element>();
 
-  function isReject(button) {
+  function isReject(button: Control) {
     if (button.matches(knownReject)) {
       // Quantcast utilise aussi ce style pour d'autres actions selon sa configuration.
       if (!button.matches('.qc-cmp2-summary-buttons button[mode="secondary"]')) return true;
@@ -26,8 +28,8 @@
     return false;
   }
 
-  function scan(root) {
-    const buttons = [...(root.matches?.(controls) ? [root] : []), ...root.querySelectorAll(controls)];
+  function scan(root: Element) {
+    const buttons = [...(root.matches?.(controls) ? [root as Control] : []), ...root.querySelectorAll<Control>(controls)];
     for (const button of buttons) {
       if (!enabled || !button.isConnected || clicked.has(button) || button.disabled || button.getAttribute('aria-disabled') === 'true' || !isReject(button)) continue;
       if (!button.getClientRects().length || button.closest('[hidden], [inert], [aria-hidden="true"]')) continue;
@@ -38,9 +40,9 @@
     }
   }
 
-  function schedule(root) {
-    if (!enabled || !root?.querySelectorAll) return;
-    pending.add(root);
+  function schedule(root: Node | null) {
+    if (!enabled || !(root as Element | null)?.querySelectorAll) return;
+    pending.add(root as Element);
     if (timer !== null) return;
     timer = setTimeout(() => {
       timer = null;
@@ -59,12 +61,12 @@
       } else schedule(record.target.nodeType === 1 ? record.target : record.target.parentElement);
     }
   });
-  function configure(state) {
+  function configure(state: State | undefined) {
     const next = (state?.enabled ?? true) && (state?.autoDenyCookies ?? true);
     if (next === enabled) return;
     enabled = next;
     observer.disconnect();
-    clearTimeout(timer);
+    if (timer !== null) clearTimeout(timer);
     timer = null;
     pending.clear();
     if (enabled) {
@@ -74,7 +76,7 @@
   }
   let changed = false;
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && changes.state) { changed = true; configure(changes.state.newValue); }
+    if (area === 'local' && changes.state) { changed = true; configure(changes.state.newValue as State | undefined); }
   });
-  chrome.storage.local.get('state', ({ state }) => { if (!changed) configure(state); });
+  chrome.storage.local.get<{ state?: State }>('state', ({ state }) => { if (!changed) configure(state); });
 })();

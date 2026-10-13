@@ -1,6 +1,7 @@
 (() => {
   if (location.pathname !== "/search") return;
-  const definitions = [
+  type State = Partial<import("../../shared/types.js").ExtensionState>;
+  const definitions: [string, string, string | null, string | null][] = [
     ["web", "Eco", "udm", "web"],
     ["news", "Actualités", "tbm", "nws"],
     ["images", "Images", "udm", "2"],
@@ -9,8 +10,8 @@
   ];
   const controls = 'a, button, [role="button"], [role="tab"], [role="link"]';
   const labels = /^(web|tous|all|images?|vidéos?|videos?|actualités|news|mode ia|ai mode|shopping|maps|livres|books|finance|vidéos courtes|short videos|plus|more|more filters|plus de filtres)$/i;
-  const normalize = (text) => (text || "").trim().replace(/\s+/g, " ");
-  const kind = (node) => {
+  const normalize = (text: string | null) => (text || "").trim().replace(/\s+/g, " ");
+  const kind = (node: Element) => {
     const text = normalize(node.textContent);
     if (/^web$/i.test(text)) return "web";
     if (/^(vidéos?|videos?)$/i.test(text)) return "videos";
@@ -19,28 +20,28 @@
     if (/^maps$/i.test(text)) return "maps";
     return null;
   };
-  const branch = (row, node) => {
+  const branch = (row: Element, node: Element) => {
     while (node.parentElement && node.parentElement !== row) node = node.parentElement;
     return node.parentElement === row ? node : null;
   };
   const surfaces = '#hdtb, #top_nav, nav, [role="navigation"]';
-  let enabled = null;
-  let activeRow = null;
-  const renamed = new Map();
+  let enabled: boolean | null = null;
+  let activeRow: Element | null = null;
+  const renamed = new Map<Element, string | null>();
   // Les mutations sont traitées avant le prochain rendu, sans attendre une frame.
   // Ignorer les résultats et annonces : ils ne nécessitent pas de refaire les onglets.
   const observer = new MutationObserver((records) => {
     if (enabled === null) { pending(true); return; }
     if (!enabled) return;
     if (records.some(record => {
-      const target = record.target.nodeType === 1 ? record.target : record.target.parentElement;
+      const target = record.target.nodeType === 1 ? record.target as Element : record.target.parentElement;
       if (target?.closest(surfaces)) return true;
       return [...record.addedNodes, ...record.removedNodes].some(node => node.nodeType === 1 &&
-        (node === activeRow || node.contains(activeRow) || node.matches(surfaces) || node.querySelector(surfaces)));
+        (node === activeRow || node.contains(activeRow) || (node as Element).matches(surfaces) || (node as Element).querySelector(surfaces)));
     })) update();
   });
   const observe = () => observer.observe(document, { childList: true, subtree: true, characterData: true });
-  function pending(value) {
+  function pending(value: boolean) {
     document.documentElement?.toggleAttribute('data-gsaio-pending', value);
   }
 
@@ -87,11 +88,11 @@
       // Réinitialiser uniquement nos attributs et les liens manquants ajoutés.
       // Les onglets natifs gardent leurs enfants, href, événements et position DOM.
       row.setAttribute("data-gsaio-row", "");
-      const kept = new Set();
+      const kept = new Set<Element>();
       definitions.forEach(([type, label, parameter, value], index) => {
         // Ne pas réutiliser le conteneur entier du menu « Plus » pour un lien caché.
         const native = tabs.find((node) => kind(node) === type &&
-          !kept.has(branch(row, node)) &&
+          !kept.has(branch(row, node)!) &&
           !branch(row, node)?.querySelector('[aria-expanded], [role="menu"]'));
         let item = native && branch(row, native);
         if (native && type === "web") {
@@ -108,14 +109,14 @@
           if (row.getAttribute("role") === "list") item.setAttribute("role", "listitem");
           const link = document.createElement("a");
           // Reprendre uniquement les classes de présentation natives, sans contrôleur Google.
-          const sample = tabs.find((node) => ["images", "news", "videos"].includes(kind(node)));
+          const sample = tabs.find((node) => ["images", "news", "videos"].includes(kind(node) ?? ""));
           const sampleLabel = sample && [...sample.querySelectorAll('*')].find((node) =>
             !node.children.length && labels.test(normalize(node.textContent)));
-          let caption = link;
-          if (sampleLabel) {
+          let caption: Element = link;
+          if (sample && sampleLabel) {
             link.className = sample.className;
-            const ancestors = [];
-            for (let node = sampleLabel; node !== sample; node = node.parentElement) ancestors.unshift(node);
+            const ancestors: Element[] = [];
+            for (let node: Element | null = sampleLabel; node && node !== sample; node = node.parentElement) ancestors.unshift(node);
             for (const node of ancestors) {
               const child = document.createElement(node.tagName);
               child.className = node.className;
@@ -134,8 +135,8 @@
             url.pathname = "/maps/search/";
             url.search = "";
             url.searchParams.set("api", "1");
-            url.searchParams.set("query", current.searchParams.get("q"));
-          } else url.searchParams.set(parameter, value);
+            url.searchParams.set("query", current.searchParams.get("q")!);
+          } else url.searchParams.set(parameter!, value!);
           url.hash = "";
           link.href = url.href;
           if (parameter && (current.searchParams.get(parameter) === value ||
@@ -159,9 +160,12 @@
   }
   pending(true);
   observe();
-  chrome.storage.local.get("state", ({ state }) => { enabled = (state?.enabled ?? true) && (state?.ecoTab ?? true); update(); });
+  chrome.storage.local.get<{ state?: State }>("state", ({ state }) => { enabled = (state?.enabled ?? true) && (state?.ecoTab ?? true); update(); });
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && changes.state) { enabled = (changes.state.newValue?.enabled ?? true) && (changes.state.newValue?.ecoTab ?? true); update(); }
+    if (area === "local" && changes.state) {
+      const state = changes.state.newValue as State | undefined;
+      enabled = (state?.enabled ?? true) && (state?.ecoTab ?? true); update();
+    }
   });
   // Ne pas laisser une navigation inconnue invisible si Google change sa structure.
   document.addEventListener('DOMContentLoaded', () => {

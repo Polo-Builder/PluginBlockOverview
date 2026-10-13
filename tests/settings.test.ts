@@ -1,21 +1,25 @@
 import test, { beforeEach } from "node:test";
 import assert from "node:assert/strict";
-import { initialize, setWeb, setAutoDenyCookies, setFeature } from "../Shared/settings.js";
-import { readState } from "../Shared/state.js";
-import { applyEco, restore } from "../Features/AutoEcoSetting/settings.js";
+import { initialize, setWeb, setAutoDenyCookies, setFeature } from "../src/shared/settings.js";
+import { readState } from "../src/shared/state.js";
+import { applyEco, restore } from "../src/features/AutoEcoSetting/settings.js";
+import type { ExtensionState, Feature } from "../src/shared/types.js";
 
-let stored, rules, underlying, override, locked, failRules, failSet, failClear, changes;
+let stored: { state?: Partial<ExtensionState> };
+let rules: chrome.declarativeNetRequest.Rule[];
+let underlying: boolean, override: boolean | undefined, locked: string | null;
+let failRules: boolean, failSet: boolean, failClear: boolean, changes: number;
 beforeEach(() => {
   stored = {}; rules = []; underlying = true; override = undefined;
   locked = null; failRules = false; failSet = false; failClear = false; changes = 0;
   globalThis.chrome = {
     storage: { local: {
       get: async () => structuredClone(stored),
-      set: async (value) => { stored = structuredClone(value); }
+      set: async (value: typeof stored) => { stored = structuredClone(value); }
     } },
     declarativeNetRequest: {
       getDynamicRules: async () => structuredClone(rules),
-      updateDynamicRules: async ({ addRules }) => {
+      updateDynamicRules: async ({ addRules }: { addRules: chrome.declarativeNetRequest.Rule[] }) => {
         if (failRules) throw new Error("DNR failure");
         rules = structuredClone(addRules);
       }
@@ -23,10 +27,10 @@ beforeEach(() => {
     privacy: { network: { networkPredictionEnabled: {
       get: async () => ({ value: locked ? underlying : (override ?? underlying),
         levelOfControl: locked ?? (override === undefined ? "controllable_by_this_extension" : "controlled_by_this_extension") }),
-      set: async ({ value }) => { if (failSet) throw new Error("set failure"); override = value; changes++; },
+      set: async ({ value }: { value: boolean }) => { if (failSet) throw new Error("set failure"); override = value; changes++; },
       clear: async () => { if (failClear) throw new Error("clear failure"); override = undefined; }
     } } }
-  };
+  } as unknown as typeof chrome;
 });
 test("installation ON ; OFF persiste au redémarrage", async () => {
   assert.equal((await initialize()).enabled, true);
@@ -42,7 +46,7 @@ test("refus cookies activé par défaut et préférence conservée au redémarra
   await setAutoDenyCookies(false);
   await setWeb(false); await setWeb(true);
   assert.equal((await initialize()).autoDenyCookies, false);
-  await assert.rejects(setAutoDenyCookies('true'));
+  await assert.rejects(setAutoDenyCookies('true' as unknown as boolean));
   assert.equal((await readState()).autoDenyCookies, false);
 });
 test("bouton automatique idempotent, sauvegarde et restauration", async () => {
@@ -51,7 +55,7 @@ test("bouton automatique idempotent, sauvegarde et restauration", async () => {
   assert.equal(applied.enabled, true);
   assert.equal(override, false);
   assert.equal(applied.backup.web, false);
-  assert.equal(applied.backup.prediction.previousValue, true);
+  assert.equal(applied.backup.prediction!.previousValue, true);
   await applyEco();
   assert.equal(changes, 1);
   const restored = await restore();
@@ -82,8 +86,8 @@ for (const policy of ["not_controllable", "controlled_by_other_extensions"]) {
     locked = policy;
     const state = await applyEco();
     assert.equal(changes, 0);
-    assert.equal(state.report.applied.some((x) => x.includes("tout Chrome")), false);
-    assert.equal(state.report.skipped.some((x) => x.includes("organisation")), true);
+    assert.equal(state.report!.applied.some((x) => x.includes("tout Chrome")), false);
+    assert.equal(state.report!.skipped.some((x) => x.includes("organisation")), true);
   });
 }
 test("restauration conserve un choix Chrome sous-jacent plus récent", async () => {
@@ -114,14 +118,14 @@ test("échec DNR : retour à la préférence précédente", async () => {
 test("échec privacy : jamais de faux succès, sauvegarde conservée", async () => {
   failSet = true;
   const state = await applyEco();
-  assert.equal(state.report.applied.length, 1);
-  assert.equal(state.report.skipped.some((x) => x.includes("non confirmée")), true);
+  assert.equal(state.report!.applied.length, 1);
+  assert.equal(state.report!.skipped.some((x) => x.includes("non confirmée")), true);
   assert.ok(state.backup.prediction);
 });
 test("échec restauration : sauvegarde conservée pour réessayer", async () => {
   await applyEco(); failClear = true;
   const state = await restore();
-  assert.equal(state.report.title, "Restauration incomplète");
+  assert.equal(state.report!.title, "Restauration incomplète");
   assert.ok(state.backup.prediction);
   failClear = false;
   assert.deepEqual((await restore()).backup, {});
@@ -145,8 +149,8 @@ test("interrupteurs indépendants : IA pilote les redirections, Eco conserve sa 
   assert.equal(rules.length, 0);
   await setFeature("blockAI", true);
   assert.equal(rules.length, 4);
-  await assert.rejects(setFeature("unknown", true));
-  await assert.rejects(setFeature("ecoTab", "true"));
+  await assert.rejects(setFeature("unknown" as Feature, true));
+  await assert.rejects(setFeature("ecoTab", "true" as unknown as boolean));
 });
 
 test("échec du toggle IA : préférence précédente conservée", async () => {

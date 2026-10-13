@@ -1,10 +1,11 @@
-import { initialize, setWeb, setAutoDenyCookies, setFeature } from "./settings.js";
-import { readState } from "./state.js";
-import { applyEco, restore } from "../Features/AutoEcoSetting/settings.js";
+import { initialize, setWeb, setAutoDenyCookies, setFeature } from "./shared/settings.js";
+import { readState } from "./shared/state.js";
+import { applyEco, restore } from "./features/AutoEcoSetting/settings.js";
+import type { ExtensionMessage, ExtensionState, MessageType } from "./shared/types.js";
 
 // Une file unique évite les conflits entre popup, installation et redémarrage.
-let queue = Promise.resolve();
-function enqueue(operation) {
+let queue: Promise<unknown> = Promise.resolve();
+function enqueue<T>(operation: () => Promise<T>): Promise<T> {
   const result = queue.then(operation);
   queue = result.catch(() => {});
   return result;
@@ -14,13 +15,13 @@ const start = () => enqueue(initialize).catch(() => {
 });
 chrome.runtime.onInstalled.addListener(start);
 chrome.runtime.onStartup.addListener(start);
-chrome.runtime.onMessage.addListener((message, sender, reply) => {
+chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender, reply) => {
   if (sender.id !== chrome.runtime.id) return false;
-  const operations = {
+  const operations: Record<MessageType, () => Promise<ExtensionState>> = {
     getState: readState,
-    setWeb: () => setWeb(message.enabled),
-    setAutoDenyCookies: () => setAutoDenyCookies(message.enabled),
-    setFeature: () => setFeature(message.feature, message.enabled),
+    setWeb: () => setWeb(message.enabled!),
+    setAutoDenyCookies: () => setAutoDenyCookies(message.enabled!),
+    setFeature: () => setFeature(message.feature!, message.enabled!),
     applyEco,
     restore
   };

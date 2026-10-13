@@ -1,7 +1,8 @@
-import { syncRedirect } from "../Features/BlockOverviewIA/redirect.js";
-import { changeWeb } from "../Features/BlockOverviewIA/mode.js";
-import { prediction, releasePrediction } from "../Features/AutoEcoSetting/prediction.js";
+import { syncRedirect } from "../features/BlockOverviewIA/redirect.js";
+import { changeWeb } from "../features/BlockOverviewIA/mode.js";
+import { prediction, releasePrediction } from "../features/AutoEcoSetting/prediction.js";
 import { readState, save } from "./state.js";
+import type { Feature } from "./types.js";
 
 export async function initialize() {
   const state = await readState();
@@ -15,7 +16,7 @@ export async function initialize() {
   return state;
 }
 
-export async function setAutoDenyCookies(enabled) {
+export async function setAutoDenyCookies(enabled: boolean) {
   if (typeof enabled !== "boolean") throw new Error("Préférence invalide.");
   const state = await readState();
   state.autoDenyCookies = enabled;
@@ -23,7 +24,7 @@ export async function setAutoDenyCookies(enabled) {
   return state;
 }
 
-export async function setFeature(feature, enabled) {
+export async function setFeature(feature: Feature, enabled: boolean) {
   if (!["blockAI", "ecoTab"].includes(feature) || typeof enabled !== "boolean") {
     throw new Error("Préférence invalide.");
   }
@@ -45,7 +46,7 @@ export async function setFeature(feature, enabled) {
   return state;
 }
 
-export async function setWeb(enabled) {
+export async function setWeb(enabled: boolean) {
   if (typeof enabled !== "boolean") throw new Error("Préférence invalide.");
   const state = await readState();
   await changeWeb(state, enabled);
