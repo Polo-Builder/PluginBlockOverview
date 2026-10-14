@@ -8,8 +8,9 @@
     "strict": true,
     "noEmitOnError": true,
     "skipLibCheck": true,
+    "removeComments": true,
     "rootDir": ".",
     "outDir": "build"
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"]
+  "include": ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts"]
 }

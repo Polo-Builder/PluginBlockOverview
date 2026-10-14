@@ -7,3 +7,7 @@ install-log.txt
 node_modules/
 # JavaScript generated from the TypeScript sources for Chrome and tests.
 /build/
+/dist/*
+!/dist/assets/
+!/dist/src/
+!/dist/manifest.json

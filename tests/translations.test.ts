@@ -62,7 +62,7 @@ test("détection à document_start : attend la langue et ne réécrit pas les r�
   assert.equal(writes.length, 1);
 });
 
-async function popup(googleLanguage?: string, cached?: string, fail = false, browserLanguage = "en", failStorage = false) {
+async function popup(googleLanguage?: string, cached?: string, fail = false, browserLanguage = "en", failStorage = false, applied = false) {
   const attributes: Record<string, string> = {};
   const nodes = new Map<string, { textContent: string; dataset: { i18n?: string; i18nLabel?: string }; hidden: boolean; disabled: boolean; checked: boolean; addEventListener: () => void; setAttribute: (name: string, value: string) => void }>();
   const node = (selector: string) => {
@@ -95,7 +95,7 @@ async function popup(googleLanguage?: string, cached?: string, fail = false, bro
         return { googleLanguage: cached };
       } }, onChanged: { addListener: () => {} } },
       runtime: { sendMessage: async () => fail ? { ok: false, error: "settingsUnconfirmed" } : {
-        ok: true, state: { enabled: true, autoDenyCookies: true, blockAI: true, ecoTab: true, ecoApplied: false, backup: {}, report: null }
+        ok: true, state: { enabled: true, autoDenyCookies: true, blockAI: true, ecoTab: true, ecoApplied: applied, backup: {}, report: null }
       } }
     }
   });
@@ -129,4 +129,12 @@ test("Google sans indication de langue : suit le navigateur français", () => {
   const translations = translator("fr-FR");
   assert.equal(translations.googleLanguage("https://www.google.com/search?q=eco"), "fr");
   assert.equal(translations.googleLanguage("https://www.google.com/search?q=eco&hl=de", "fr"), "en");
+});
+
+test("Restaurer reste accessible avec les réglages confirmés et une sauvegarde vide", async () => {
+  const page = await popup("fr", undefined, false, "fr", false, true);
+  assert.equal(page.node("#eco-done").hidden, false);
+  assert.equal(page.node("#restore").disabled, false);
+  const unavailable = await popup("fr", undefined, true);
+  assert.equal(unavailable.node("#restore").disabled, true);
 });

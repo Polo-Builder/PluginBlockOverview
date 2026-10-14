@@ -1,5 +1,5 @@
 // Exécuter dans /search?q=chat avec google-navigation.html, les styles Google,
-// src/features/EcoTab/filter-tabs.css, un mock chrome.storage, build/src/shared/translations.js
+// dist/src/features/EcoTab/filter-tabs.css, un mock chrome.storage, build/src/shared/translations.js
 // puis build/src/features/EcoTab/filter-tabs.js.
 (async () => {
   const frame = () => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));

@@ -49,7 +49,6 @@ function render() {
   tabsToggle.checked = state.ecoTab;
   document.querySelector<HTMLElement>("#eco-done")!.hidden = !state.ecoApplied;
   document.querySelector("#mode")!.textContent = state.enabled ? "ON" : "OFF";
-  restoreButton.disabled = Object.keys(state.backup).length === 0;
   setStatus(null);
 }
 
@@ -74,7 +73,7 @@ async function send(type: MessageType, extra: Partial<ExtensionMessage> = {}) {
     aiToggle.disabled = !state || !state.enabled;
     tabsToggle.disabled = !state || !state.enabled;
     eco.disabled = !state || !state.enabled;
-    restoreButton.disabled = !state || !Object.keys(state.backup).length;
+    restoreButton.disabled = !state;
   }
 }
 toggle.addEventListener("change", () => send("setWeb", { enabled: toggle.checked }));
