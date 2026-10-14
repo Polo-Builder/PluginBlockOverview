@@ -1,6 +1,6 @@
 (() => {
-  const current = () => EcoWebI18n.googleLanguage(location.href, document.documentElement?.lang);
-  let previous: EcoWebI18n.Language | undefined;
+  const current = () => EcoWebTranslations.googleLanguage(location.href, document.documentElement?.lang);
+  let previous: EcoWebTranslations.Language | undefined;
   function update() {
     // Ne mémoriser que la langue réellement indiquée par Google.
     if (!document.documentElement?.lang &&
@@ -10,7 +10,7 @@
     previous = language;
     document.dispatchEvent(new Event("ecoweb-language-change"));
     // Stockage séparé des réglages : aucun conflit avec la file du service worker.
-    void chrome.storage.local.get<{ googleLanguage?: EcoWebI18n.Language }>("googleLanguage").then(stored => {
+    void chrome.storage.local.get<{ googleLanguage?: EcoWebTranslations.Language }>("googleLanguage").then(stored => {
       if (stored.googleLanguage !== language) return chrome.storage.local.set({ googleLanguage: language });
     }).catch(() => {});
   }

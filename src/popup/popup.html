@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>EcoWeb</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="../../build/src/shared/i18n.js"></script>
+  <script src="../../build/src/shared/translations.js"></script>
   <script type="module" src="../../build/src/popup/popup.js"></script>
+  <script type="module" src="../../build/src/shared/kofi.js"></script>
 </head>
 <body>
   <main>
@@ -55,6 +56,20 @@
     </section>
 
     <div id="status" role="status" aria-live="polite" aria-atomic="true"></div>
+    <footer class="support">
+      <button id="kofi-button" type="button" aria-expanded="false" aria-controls="kofi-panel">
+        <img src="../../assets/icons/kofi.png" width="30" height="24" alt="">
+        <span data-i18n="support"></span>
+      </button>
+      <p data-i18n="supportDescription"></p>
+    </footer>
+    <section id="kofi-panel" class="kofi-panel" aria-label="Ko-fi" hidden>
+      <div class="kofi-heading">
+        <a href="https://ko-fi.com/polobuilder" target="_blank" rel="noopener noreferrer">ko-fi.com/polobuilder</a>
+        <button id="kofi-close" type="button" data-i18n-label="closeSupport">×</button>
+      </div>
+      <iframe id="kofiframe" data-src="https://ko-fi.com/polobuilder/?hidefeed=true&amp;widget=true&amp;embed=true&amp;preview=true" height="712" title="polobuilder"></iframe>
+    </section>
   </main>
 </body>
 </html>

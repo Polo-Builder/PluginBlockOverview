@@ -10,3 +10,4 @@
 * Make targeted changes only. Avoid unrelated refactoring and unnecessary dependencies.
 * Keep the extension lightweight and robust against minor Google DOM changes.
 * Do not create or update README files unless explicitly requested.
+* The extension's current version is `1.0.0`. Never change the version in `manifest.json` without the user's explicit authorization.

@@ -1,5 +1,5 @@
 // Script commun au popup et aux pages Google : aucun module ni bibliothèque à charger.
-namespace EcoWebI18n {
+namespace EcoWebTranslations {
   export type Language = "fr" | "en";
   const french = {
     enableExtension: "Activer l’extension",
@@ -7,13 +7,16 @@ namespace EcoWebI18n {
     blockDescription: "Masque les aperçus IA des résultats de recherche.",
     tabsTitle: "Onglet Eco",
     tabsDescription: "L’onglet principal devient Eco : juste l’essentiel.",
-    cookiesTitle: "Refus automatique des cookies",
+    cookiesTitle: "Refus des cookies",
     cookiesDescription: "Refuse automatiquement les cookies non essentiels.",
     settingsTitle: "Réglages automatiques",
     settingsDescription: "Réduit l’activité de Chrome en arrière-plan.",
     settingsDone: "✓ OK",
     apply: "Appliquer",
     restore: "Restaurer",
+    support: "Me soutenir",
+    supportDescription: "EcoWeb est gratuit. Soutenez son développeur.",
+    closeSupport: "Fermer le panneau Ko-fi",
     checking: "Vérification en cours…",
     checkRequired: "à vérifier",
     unavailable: "Extension indisponible.",
@@ -33,13 +36,16 @@ namespace EcoWebI18n {
     blockDescription: "Hides AI overviews from search results.",
     tabsTitle: "Eco tab",
     tabsDescription: "Your main tab becomes Eco: just the essentials.",
-    cookiesTitle: "Automatic cookie rejection",
+    cookiesTitle: "Cookie rejection",
     cookiesDescription: "Automatically rejects non-essential cookies.",
     settingsTitle: "Automatic settings",
     settingsDescription: "Reduces Chrome’s background activity.",
     settingsDone: "✓ OK",
     apply: "Apply",
     restore: "Restore",
+    support: "Support me",
+    supportDescription: "EcoWeb is free. Support its developer.",
+    closeSupport: "Close the Ko-fi panel",
     checking: "Checking…",
     checkRequired: "check required",
     unavailable: "Extension unavailable.",

@@ -4,11 +4,11 @@ import vm from "node:vm";
 import { readFileSync } from "node:fs";
 
 const readScript = (file: string) => readFileSync(new URL(`../src/${file}.js`, import.meta.url), "utf8");
-const source = readScript("shared/i18n");
+const source = readScript("shared/translations");
 function translator(browserLanguage = "en") {
   const context = vm.createContext({ URL, chrome: { i18n: { getUILanguage: () => browserLanguage } } });
   vm.runInContext(source, context);
-  return context.EcoWebI18n as typeof EcoWebI18n;
+  return context.EcoWebTranslations as typeof EcoWebTranslations;
 }
 
 test("langue Google : français et variantes, anglais pour toutes les autres langues", () => {

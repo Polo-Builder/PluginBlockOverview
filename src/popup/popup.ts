@@ -8,34 +8,34 @@ const eco = document.querySelector<HTMLButtonElement>("#eco")!;
 const restoreButton = document.querySelector<HTMLButtonElement>("#restore")!;
 const status = document.querySelector<HTMLElement>("#status")!;
 let state: ExtensionState | undefined;
-let locale: EcoWebI18n.Language = EcoWebI18n.browserLanguage();
-let statusKey: EcoWebI18n.Key | null = null;
+let locale: EcoWebTranslations.Language = EcoWebTranslations.browserLanguage();
+let statusKey: EcoWebTranslations.Key | null = null;
 let modeNeedsCheck = false;
-const t = (key: EcoWebI18n.Key) => EcoWebI18n.text(key, locale);
+const t = (key: EcoWebTranslations.Key) => EcoWebTranslations.text(key, locale);
 
-function setStatus(key: EcoWebI18n.Key | null) {
+function setStatus(key: EcoWebTranslations.Key | null) {
   statusKey = key;
   status.textContent = key ? t(key) : "";
 }
 
-async function detectLanguage(): Promise<EcoWebI18n.Language> {
+async function detectLanguage(): Promise<EcoWebTranslations.Language> {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tab?.id !== undefined) {
       const result: { language?: string } = await chrome.tabs.sendMessage(tab.id, { type: "getGoogleLanguage" }, { frameId: 0 });
-      if (result?.language) return EcoWebI18n.language(result.language);
+      if (result?.language) return EcoWebTranslations.language(result.language);
     }
   } catch { /* Hors de Google, réutiliser la dernière langue détectée. */ }
   try {
     const stored = await chrome.storage.local.get<{ googleLanguage?: string }>("googleLanguage");
-    if (stored.googleLanguage) return EcoWebI18n.language(stored.googleLanguage);
+    if (stored.googleLanguage) return EcoWebTranslations.language(stored.googleLanguage);
   } catch { /* La langue du navigateur reste disponible sans stockage. */ }
-  return EcoWebI18n.browserLanguage();
+  return EcoWebTranslations.browserLanguage();
 }
 
 async function translate() {
   locale = await detectLanguage();
-  EcoWebI18n.translate(document.documentElement, locale);
+  EcoWebTranslations.translate(document.documentElement, locale);
   setStatus(statusKey);
   if (modeNeedsCheck) document.querySelector("#mode")!.textContent = t("checkRequired");
 }

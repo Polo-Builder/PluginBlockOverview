@@ -1,7 +1,7 @@
 (() => {
   if (location.pathname !== "/search") return;
   type State = Partial<import("../../shared/types.js").ExtensionState>;
-  const definitions: [string, EcoWebI18n.Key, string | null, string | null][] = [
+  const definitions: [string, EcoWebTranslations.Key, string | null, string | null][] = [
     ["web", "eco", "udm", "web"],
     ["news", "news", "tbm", "nws"],
     ["images", "images", "udm", "2"],
@@ -89,9 +89,9 @@
       // Les onglets natifs gardent leurs enfants, href, événements et position DOM.
       row.setAttribute("data-gsaio-row", "");
       const kept = new Set<Element>();
-      const language = EcoWebI18n.googleLanguage(current.href, document.documentElement?.lang);
+      const language = EcoWebTranslations.googleLanguage(current.href, document.documentElement?.lang);
       definitions.forEach(([type, labelKey, parameter, value], index) => {
-        const label = EcoWebI18n.text(labelKey, language);
+        const label = EcoWebTranslations.text(labelKey, language);
         // Ne pas réutiliser le conteneur entier du menu « Plus » pour un lien caché.
         const native = tabs.find((node) => kind(node) === type &&
           !kept.has(branch(row, node)!) &&
